@@ -6,11 +6,11 @@
 <title>Jungwon Runner — Dino Clone</title>
 <style>
   :root{
-    --bg:#f7f7f7;
+    --bg:#cce8ff;
     --ground:#555;
     --runner:#222;
-    --ob:#2a2a2a;
-    --cloud:#dcdcdc;
+    --ob:#f5bdff;
+    --cloud:#209ce8;
     --text:#222;
   }
   html,body{
@@ -49,8 +49,8 @@
 <body>
 <div class="wrap">
   <div>
-    <canvas id="c" width="900" height="200"></canvas>
-    <div class="hint">Tap / Click or press <strong>Space</strong> to jump. Press <strong>R</strong> to restart when game over.</div>
+    <canvas id="c" width="900" height="5000"></canvas>
+    <div class="hint">Tap / Click or press <strong>Space</strong> to jump.</div>
   </div>
 </div>
 
@@ -86,10 +86,10 @@ let started = false;
 
 // Player (runner)
 const player = {
-  x: 60,
-  y: GROUND_Y - 46, // top
-  width: 44,
-  height: 46,
+  x: 130,
+  y: GROUND_Y - 102, // top
+  width: 100,
+  height: 102,
   vy: 0,
   grounded: true,
   sprintFrame: 0,
