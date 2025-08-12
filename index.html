@@ -1,18 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ready Set WON 🎂</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Jungwon Pixel Run</title>
+<style>
+  body {
+    background: #87CEEB; /* Sky blue */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: monospace;
+  }
+  canvas {
+    border: 4px solid #333;
+    background: #cceeff;
+    image-rendering: pixelated;
+  }
+</style>
 </head>
 <body>
-  <h1>🎉 Happy Jungwon Day! 🎉</h1>
-  <canvas id="gameCanvas"></canvas>
-  <div class="controls">
-    <p>Press SPACE or tap to jump!</p>
-    <button id="restartBtn">Restart</button>
-  </div>
-  <script src="script.js"></script>
+<canvas id="gameCanvas" width="800" height="300"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+let jungwon = {
+  x: 50,
+  y: 220,
+  width: 20,
+  height: 20,
+  velocityY: 0,
+  jumpPower: -8,
+  gravity: 0.5
+};
+
+let groundHeight = 40;
+let obstacles = [];
+let frame = 0;
+let score = 0;
+let gameOver = false;
+
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && jungwon.y >= canvas.height - groundHeight - jungwon.height) {
+    jungwon.velocityY = jungwon.jumpPower;
+  }
+  if (gameOver && e.code === "Enter") {
+    restartGame();
+  }
+});
+
+function drawPixelJungwon(x, y) {
+  // Name
+  ctx.fillStyle = "#000";
+  ctx.font = "10px monospace";
+  ctx.fillText("Jungwon", x - 10, y - 5);
+
+  // Pixel face & body (simplified avatar)
+  ctx.fillStyle = "#FFD1A4"; // skin tone
+  ctx.fillRect(x, y, 20, 20); // head
+
+  ctx.fillStyle = "#000"; // hair
+  ctx.fillRect(x, y, 20, 5); // top hair
+  ctx.fillRect(x, y, 5, 8);  // left hair
+  ctx.fillRect(x+15, y, 5, 8); // right hair
+
+  ctx.fillStyle = "#fff"; // eyes
+  ctx.fillRect(x+5, y+8, 3, 3);
+  ctx.fillRect(x+12, y+8, 3, 3);
+
+  ctx.fillStyle = "#000"; // pupils
+  ctx.fillRect(x+6, y+9, 1, 1);
+  ctx.fillRect(x+13, y+9, 1, 1);
+
+  ctx.fillStyle = "#87CEEB"; // shirt
+  ctx.fillRect(x, y+20, 20, 15);
+
+  ctx.fillStyle = "#555"; // pants
+  ctx.fillRect(x, y+35, 20, 10);
+}
+
+function spawnObstacle() {
+  obstacles.push({
+    x: canvas.width,
+    y: canvas.height - groundHeight - 20,
+    width: 20,
+    height: 20
+  });
+}
+
+function drawObstacle(o) {
+  ctx.fillStyle = "#ff4444"; // red pixel block
+  ctx.fillRect(o.x, o.y, o.width, o.height);
+}
+
+function update() {
+  if (gameOver) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Ground
+  ctx.fillStyle = "#228B22";
+  ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+  // Player physics
+  jungwon.y += jungwon.velocityY;
+  jungwon.velocityY += jungwon.gravity;
+
+  if (jungwon.y > canvas.height - groundHeight - jungwon.height) {
+    jungwon.y = canvas.height - groundHeight - jungwon.height;
+  }
+
+  // Draw player
+  drawPixelJungwon(jungwon.x, jungwon.y - 35);
+
+  // Obstacles
+  for (let i = 0; i < obstacles.length; i++) {
+    let o = obstacles[i];
+    o.x -= 4;
+    drawObstacle(o);
+
+    // Collision check
+    if (jungwon.x < o.x + o.width &&
+        jungwon.x + jungwon.width > o.x &&
+        jungwon.y < o.y + o.height &&
+        jungwon.y + jungwon.height > o.y) {
+      gameOver = true;
+    }
+  }
+
+  // Spawn obstacles
+  if (frame % 90 === 0) spawnObstacle();
+
+  // Score
+  score++;
+  ctx.fillStyle = "#000";
+  ctx.font = "14px monospace";
+  ctx.fillText("Score: " + score, 10, 20);
+
+  if (gameOver) {
+    ctx.fillStyle = "#000";
+    ctx.font = "20px monospace";
+    ctx.fillText("GAME OVER! Press Enter to restart", 200, 150);
+  }
+
+  frame++;
+  requestAnimationFrame(update);
+}
+
+function restartGame() {
+  jungwon.y = 220;
+  jungwon.velocityY = 0;
+  obstacles = [];
+  frame = 0;
+  score = 0;
+  gameOver = false;
+  update();
+}
+
+update();
+</script>
 </body>
 </html>
